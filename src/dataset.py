@@ -2,6 +2,8 @@ import torch.utils.data as data
 from glob import glob
 import os
 from random import choice
+import cv2
+import numpy as np
 
 
 class LWADDataset(data.Dataset):
@@ -9,6 +11,9 @@ class LWADDataset(data.Dataset):
         super(LWADDataset, self).__init__()
         self.data = glob(os.path.join(data_path, "*"))
         self.coco = glob(os.path.join(coco_path, "*"))
+        self.input_resolution = input_resolution
+        self.mean = mean
+        self.std = std
 
     def convert_image(self, image_path):
         image = cv2.imread(image_path)
@@ -38,4 +43,16 @@ class LWADDataset(data.Dataset):
 
 
 if __name__ == "__main__":
-    dataset = LWADDataset()
+    import argparse
+
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('--data_path')
+    parser.add_argument('--coco_path')
+    args = parser.parse_args()
+
+    data_path = args.data_path
+    coco_path = args.coco_path
+
+    dataset = LWADDataset(data_path, coco_path)
+
+    print(dataset[40])

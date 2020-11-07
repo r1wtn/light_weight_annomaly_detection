@@ -4,5 +4,7 @@
 
 data/
 venv/
+model_files/
+logs/
 
 .python-version

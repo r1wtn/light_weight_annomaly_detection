@@ -1,6 +1,7 @@
 import torch
 from torch import nn, rand
-
+import torchvision.models as models
+from torchvision.models import *
 
 def save_model(path, epoch_id, model, optimizer=None):
     if isinstance(model, torch.nn.DataParallel):
@@ -75,8 +76,27 @@ class LWADModel(nn.Module):
         return x
 
 
+class MobileNetFeatures(nn.Module):
+    def __init__(self):
+        super(MobileNetFeatures, self).__init__()
+        self.head = MobileNetV2().features
+        self.pool = nn.AvgPool2d(4, 4)
+        self.flat = nn.Flatten()
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        x = self.head(x)
+        x = self.pool(x)
+        x = self.flat(x)
+        x = self.sigmoid(x)
+        return x
+
+
+
+
 if __name__ == "__main__":
-    model = LWADModel()
+    model = MobileNetFeatures()
+    # model = LWADModel()
     img = rand((1, 3, 512, 512), requires_grad=True)
     out = model(img)
     print(out.shape)

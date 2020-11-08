@@ -2,13 +2,15 @@ import torch
 from torch import nn
 from torch.optim.lr_scheduler import ExponentialLR, StepLR
 from dataset import LWADDataset
-from model import *
+from models import *
 import argparse
 from tqdm import tqdm
+import codecs
 import os
 from termcolor import colored
 
 parser = argparse.ArgumentParser(description='')
+parser.add_argument('--experiment_name')
 parser.add_argument('--train_data_path')
 parser.add_argument('--train_coco_path')
 parser.add_argument('--valid_data_path')
@@ -20,6 +22,7 @@ parser.add_argument('--val_interval', type=int, default=2)
 parser.add_argument('--save_interval', type=int, default=2)
 args = parser.parse_args()
 
+experiment_name = args.experiment_name
 train_data_path = args.train_data_path
 train_coco_path = args.train_coco_path
 valid_data_path = args.valid_data_path
@@ -42,7 +45,7 @@ if not os.path.exists("../model_files/"):
 if not os.path.exists("../logs/"):
     os.makedirs("../logs/")
 
-model = LWADModel()
+model = MobileNetFeatures()
 model.to(device=device)
 model.train()
 
@@ -51,8 +54,8 @@ optimizer = torch.optim.SGD(
     model.parameters(), lr=lr, momentum=0.9, weight_decay=0.0001)
 print(batch_size)
 # define data loader
-train_dataset = LWADDataset(train_data_path, train_coco_path)
-valid_dataset = LWADDataset(valid_data_path, valid_coco_path)
+train_dataset = LWADDataset(train_data_path, train_coco_path, input_resolution=128)
+valid_dataset = LWADDataset(valid_data_path, valid_coco_path, input_resolution=128)
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=batch_size,
@@ -110,10 +113,16 @@ for epoch_id in range(epoch_size):
         dist_pos_mean = dist_pos_sum / count
         dist_neg_mean = dist_neg_sum / count
 
-        print(f"Positive: {dist_pos_mean}")
-        print(f"Negative: {dist_neg_mean}")
+        print(f"epoch: {epoch_id}, Positive: {dist_pos_mean}, Negative: {dist_neg_mean}")
+        print(f"epoch: {epoch_id}, Positive: {dist_pos_mean}, Negative: {dist_neg_mean}", file=codecs.open(f'../logs/{experiment_name}.txt', 'a', 'utf-8')
+        )
         model.train()
 
     if save_interval > 0 and epoch_id % save_interval == 0:
-        save_path = f"../model_files/lwad_{epoch_id:03d}.pth"
+        save_path = f"../model_files/{experiment_name}_{epoch_id:03d}.pth"
         save_model(save_path, epoch_id, model, optimizer)
+    
+    if epoch_id == epoch_size - 1:
+        save_path = f"../model_files/{experiment_name}_last.pth"
+        save_model(save_path, epoch_id, model, optimizer)
+

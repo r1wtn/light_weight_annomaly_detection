@@ -7,6 +7,9 @@ from models import *
 import json
 import cv2
 import numpy as np
+import coremltools as ct
+from torchvision.models import *
+
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('-m', '--model_file', type=str)
@@ -25,16 +28,11 @@ if model_file is not None:
 model.to(device)
 model.eval()
 
-input_names = ["input_1"]
-output_names = ["output_1"]
-
-if model_file is not None:
-    onnx_file = model_file + ".onnx"
-else:
-    onnx_file = "debug.onnx"
-print(onnx_file)
-torch.onnx.export(
-    model, img, onnx_file, verbose=True,
-    input_names=input_names, output_names=output_names,
-    dynamic_axes={'input_1': {0: 'batch_size'}, 'output_1': {0: 'batch_size'}}
+traced_model = torch.jit.trace(model, img)
+model = ct.convert(
+    traced_model,
+    # name "input_1" is used in 'quickstart'
+    inputs=[ct.ImageType(name="input_1", shape=img.shape)],
+    # # provide only if step 4 was performed
+    # classifier_config=ct.ClassifierConfig(class_labels)
 )

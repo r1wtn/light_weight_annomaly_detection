@@ -42,3 +42,22 @@ python detection.py --<options>
 | --ckpt_file | str | checkpoint file of derived from previous training | - |
 | --feature_file | str | feature file of derived from previous training  | - |
 | --image_path_list | str | `,` splited image pathes you want to evaluate | - |
+
+## Convert to CoreML model
+
+We use [CoreML](https://github.com/apple/coremltools) for iOS applicable model format.  
+To get `mlmodel`, firstly convert `.pth` to `.onnx`. After getting `.onnx`, you can convert it to `.mlmodel`.
+
+```bash
+cd src/
+python save_onnx.py --model_file <your pth model>
+```
+
+You can find `.onnx` in `../model_files/` directory.
+
+```bash
+cd src/
+python save_coreml.py --onnx_file <your onnx model>
+```
+
+You can find `.mlmodel` in `../model_files` directory.

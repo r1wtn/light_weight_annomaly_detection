@@ -45,7 +45,16 @@ python detection.py --<options>
 
 ## Convert to CoreML model
 
-We use [CoreML](https://github.com/apple/coremltools) for iOS applicable model format.  
+Please use python `3.7.x`. We could not convert to coreml model in python `3.8.x`
+
+```txt
+coremltools==4.0b3 
+onnx==1.6.0      
+onnxruntime==1.4.0
+protobuf==3.13.0
+```
+
+We use [CoreML](https://github.com/apple/coremltools) for **iOS** applicable model format.  
 To get `mlmodel`, firstly convert `.pth` to `.onnx`. After getting `.onnx`, you can convert it to `.mlmodel`.
 
 ```bash

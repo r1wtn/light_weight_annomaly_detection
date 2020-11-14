@@ -15,7 +15,7 @@ image_path = args.image_path
 onnx_file = args.onnx_file
 
 example_image = Image.open("../example/000001.png")
-example_image = example_image.resize((512, 512))
+example_image = example_image.resize((128, 128))
 coreml_file = onnx_file + ".mlmodel"
 
 scale = 1.0 / (0.5 * 255.0)
@@ -33,4 +33,3 @@ model.save(coreml_file)
 
 out_dict = model.predict({"input_1": example_image})
 print(out_dict)
-

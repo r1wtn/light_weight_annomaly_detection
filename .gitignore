@@ -5,6 +5,7 @@
 data/
 venv/
 model_files/
+saved_features/
 logs/
 
 .python-version

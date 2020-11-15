@@ -20,6 +20,8 @@ example_image01 = Image.open("../example/000001.png")
 example_image01 = example_image01.resize((128, 128))
 example_image02 = Image.open("../example/000002.jpg")
 example_image02 = example_image02.resize((128, 128))
+example_image03 = Image.open("../example/000003.png")
+example_image03 = example_image03.resize((128, 128))
 coreml_file = onnx_file + ".mlmodel"
 
 scale = 1.0 / (0.5 * 255.0)
@@ -39,6 +41,8 @@ out_dict01 = model.predict({"input_1": example_image01})
 embedding01 = out_dict01["output_1"].reshape(-1)
 out_dict02 = model.predict({"input_1": example_image02})
 embedding02 = out_dict02["output_1"].reshape(-1)
+out_dict03 = model.predict({"input_1": example_image03})
+embedding03 = out_dict03["output_1"].reshape(-1)
 
 # cosine similality
 cos_sim = np.dot(saved_feature, embedding01) / \
@@ -47,3 +51,8 @@ print(f"Image01: {cos_sim}")
 cos_sim = np.dot(saved_feature, embedding02) / \
     (np.linalg.norm(saved_feature, ord=2) * np.linalg.norm(embedding02, ord=2))
 print(f"Image02: {cos_sim}")
+cos_sim = np.dot(saved_feature, embedding03) / \
+    (np.linalg.norm(saved_feature, ord=2) * np.linalg.norm(embedding03, ord=2))
+print(f"Image03: {cos_sim}")
+
+print(embedding03)
